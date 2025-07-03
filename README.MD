@@ -24,7 +24,7 @@ CONNECTING OTHER DEVICES ON LAN TO SERVER (No Inter Network Communication)
   host the server on. This can be found if you type "ipconfig" into cmd
   and look at IPv4 address
 
-- Start server using either client_launcher.py or by running server.py in 
+- Start server using either client_launcher.py or by running server.py 
   from cmd / powershell (you can close the server by either entering 
   "ctrl + c" or just closing the terminal)
 
