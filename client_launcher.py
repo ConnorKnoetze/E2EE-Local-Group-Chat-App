@@ -13,7 +13,7 @@ if b == "False":
     file.write("downloaded=True")
 else:
     subprocess.Popen(["start", "cmd", "/k", "python server/server.py"], shell=True)
-    for i in range(1): # change range for number of clients you want to test with
+    for i in range(2): # change range for number of clients you want to test with
         subprocess.Popen(["start", "cmd", "/k", "python client/client.py"] , shell=True)
 
 file.close()
