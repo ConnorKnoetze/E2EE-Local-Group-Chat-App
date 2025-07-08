@@ -32,7 +32,7 @@ class pfp():
     
     def update(self, offset):
         self.rect[1] = self.rect[1] + offset
-        self.text_coord = (35,42+ offset)
+        self.text_coord = (35,42 + offset)
 
 
     def draw(self):
@@ -61,6 +61,8 @@ class InputBox:
         self.surfaces = [self.txt_surface]
         self.active = False
         self.text_total = [0]
+        self.send_arrow_image = os.path.join(base_dir, 'assets', 'send_arrow.png')
+        self.send_image_rect = pygame.rect.Rect(screen_size[0] - 60, screen_size[1] - 62.5, screen_size[1]* 0.059, screen_size[1] - 10)
 
     def handle_event(self, event):
         COLOR_INACTIVE = (61,61,61)
@@ -71,7 +73,17 @@ class InputBox:
             else:
                 self.active = False
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.MOUSEBUTTONUP and self.send_image_rect.collidepoint(event.pos):
+                    if self.text == [""]:
+                        pass
+                    else:
+                        message = Message(text="".join(self.text), slide=5)
+                        self.text = [""]
+                        self.text_total = [0]
+                        self.surfaces = [self.txt_surface]
+                        return message
+                    
+        elif event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
                     if self.text == [""]:
@@ -92,6 +104,7 @@ class InputBox:
                     if self.text[self.index][:-1] != "":
                         self.text_total[self.index]  -= self.font.size(self.text[self.index][-1])[0]
                     self.text[self.index] = self.text[self.index][:-1]
+
                 else:
                     self.text[self.index] += event.unicode 
                     self.text_total[self.index] += self.font.size(event.unicode)[0]
@@ -124,6 +137,16 @@ class InputBox:
             screen.blit(surface, (13.5, 
                                   self.rect[1]+ 23 + (i * 20)))
         pygame.draw.rect(screen, self.color, (self.rect[0], self.rect[1] + 5, self.rect[2], self.rect[3]), 2, 20)
+
+        self.draw_send_button()
+    
+    def draw_send_button(self):
+        send_arrow = pygame.image.load(self.send_arrow_image)
+        self.send_image_rect = pygame.rect.Rect(screen_size[0] - 60, screen_size[1] - 62.5, screen_size[1]* 0.059, screen_size[1] - 10)
+        n_image = pygame.surface.Surface((40, 40))
+        pygame.transform.scale(send_arrow, (40, 40), n_image)
+        pygame.Surface.blit(screen, n_image, self.send_image_rect)
+        
     
     def get_rect(self):
         return self.rect
@@ -287,51 +310,46 @@ class message_canvas():
         self.update_size()
 
     def translate(self, direction):
-        if direction < 0:
-            if self.rect[1] <= 22:
-                self.rect[1] -= 20 * direction
-                self.offset -= 20 * direction
-        else:
-            if (self.rect[1] + self.rect[3]) + 25 - (20 * direction) > screen_size[1] - 60 - (20 * len(textbox.text)-1):
-                self.rect[1] -= 20 * direction
-                self.offset -= 20 * direction
-        self.update_messages(direction)
-        self.update_size()
+        translated = False
+        print(self.rect, textbox.rect, direction)
+        if direction < 0 and self.rect[1] + self.rect[3] > textbox.rect[1]:
+            self.rect[1] -= 20 * -direction
+            self.offset -= 20 * -direction
+            translated = True
+        elif direction > 0 and self.rect[1] < 22:
+            print(True)
+            self.rect[1] += 20 * direction
+            self.offset += 20 * direction
+            translated = True
+
+        if translated:
+            self.update_messages(direction)
+            self.update_size()
          
     def update_size(self):
         self.rect = pygame.rect.Rect(90, self.rect[1], screen_size[0] - 180, self.total_spacing)
     
     def populate(self, message):
         self.messages.append(message)
-        if self.total_spacing + 20 >= screen_size[1]:
-            self.rect[3] += 20
-            self.offset -= 20
-            self.rect[1] -= 20 
+        gap = 20
+        if self.total_spacing + gap >= screen_size[1]:
+            self.rect[3] += gap
+            self.offset -= gap
+            self.rect[1] -= gap 
 
     def update_messages(self, direction=0):
         self.spacing = 0
         for message in self.messages:
-            message.update()
             message.translate(direction= direction, spacing = self.spacing, offset = self.offset)
             self.spacing += (len(message.text) * 20)
+            message.update()
         self.total_spacing = self.spacing
-
-
-def draw_send_button(send_arrow):
-    n_image_rect = pygame.rect.Rect(screen_size[0] - 60, screen_size[1] - 62.5, screen_size[1]* 0.059, screen_size[1] - 10)
-    n_image = pygame.surface.Surface((40, 40))
-    pygame.transform.scale(send_arrow, (40, 40), n_image)
-    pygame.Surface.blit(screen, n_image,n_image_rect)
-    return n_image_rect
 
 
 def draw_screen():
     screen_size = pygame.display.get_window_size()
     background = pygame.rect.Rect(0,0, screen_size[0], screen_size[1])
     background_color = (20,20,20)
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    send_arrow_path = os.path.join(base_dir, 'assets', 'send_arrow.png')
-    send_arrow = pygame.image.load(send_arrow_path)
 
     # draw solid background colour
     pygame.draw.rect(screen, background_color, background)
@@ -339,11 +357,7 @@ def draw_screen():
     canvas.draw()
 
     textbox.draw(screen)
-
-    # Draw Send button graphic
-    n_image_rect = draw_send_button(send_arrow)
     
-    return n_image_rect
 
 def entry_message():
     min_size = 900, 650
@@ -504,7 +518,6 @@ while running:
         offset += 55
     textbox.draw(screen)          # Draw the input box
     pygame.draw.rect(screen, (40,40,40), pygame.rect.Rect(90, 30, screen_size[0], 2))
-    draw_send_button(send_arrow)  # Draw the send button
     pygame.display.update()       # Refresh the display
 
     # Handle window resizing
@@ -521,9 +534,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False  # User closed the window
-        if event.type == pygame.MOUSEBUTTONUP:
-            if n_image_rect.collidepoint(event.pos):
-                print("send pressed")  # Send button clicked
         message = textbox.handle_event(event)  # Handle input box events
         if message:
             # User pressed Enter: add message to canvas and send to peers
