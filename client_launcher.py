@@ -8,7 +8,7 @@ _,b = file.readline().strip().split("=", 1)
 file.close
 
 if b == "False":
-    subprocess.Popen(["start", "cmd", "/k", "pip install pynacl keyboard"], shell=True)
+    subprocess.Popen(["start", "cmd", "/k", "pip install pynacl keyboard pygame"], shell=True)
     file = open(filepath,"w")
     file.write("downloaded=True")
 else:

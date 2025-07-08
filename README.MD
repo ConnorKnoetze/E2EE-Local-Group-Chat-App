@@ -1,36 +1,54 @@
-SOLVING DEPENDANCIES: First time running
+# End-to-End Encrypted Local Group Chat Application
 
+## Overview
+This project is a secure, peer-to-peer group chat application designed for local area networks (LAN). It features end-to-end encryption (E2EE) using Curve25519 (via PyNaCl) and supports both CLI and GUI clients. The application is ideal for private communication within a local network.
 
-- Either run client_launcher.py and wait for packages to install then close 
-  terminal window and relaunch client_launcher.py or "pip install 
-  package PyNaCl and keyboard" to solve dependancies.
+## Features
+- **End-to-End Encryption (E2EE):** Messages are encrypted using Curve25519 keys, ensuring secure communication.
+- **Multi-Client Support:** Run multiple clients on the same device or across devices on a LAN.
+- **LAN Connectivity:** Easily connect devices within the same network.
+- **Cross-Platform:** Compatible with Windows and other platforms supporting Python and PyNaCl.
+- **Customizable GUI:** Includes a pygame-based graphical user interface for sending and receiving messages.
 
+## Installation
+### Dependencies
+Ensure the following Python packages are installed:
+- `PyGame`
+- `PyNaCl`
+- `keyboard`
 
-RUNNING ALL CLIENTS ON THE SAME DEVICE
+You can install them manually:
+```bash
+pip install pynacl keyboard pygame
+```
+Alternatively, run `client_launcher.py` to automatically install dependencies.
 
+## Usage
+### Running Multiple Clients on the Same Device
+1. Open `client_launcher.py`.
+2. Edit the range of the `for` loop to specify the desired number of clients (default is 2).
+3. Run `client_launcher.py`.
 
-- Edit range of for loop in client_launcher.py for the desired amount of 
-  clients (Default is 2).
+### Connecting Multiple Devices on LAN
+1. Open `client.py`.
+2. Locate the line near the bottom: `server = "127.0.0.1"`.
+3. Replace `127.0.0.1` with the IPv4 address of the device hosting the server. You can find this address by running `ipconfig` in the command prompt.
+4. Start the server:
+   - Run `client_launcher.py`, or
+   - Run `server.py` directly from the command prompt or PowerShell, and
+   - Run `client.py` on all devices you wish to connect.
 
-- And simply run client_launcher.py
+### Stopping the Server
+To stop the server:
+- Press `Ctrl + C` in the terminal, or
+- Close the terminal window.
 
+## Notes
+- If running the server independently, ensure `client.py` is executed on all devices to establish communication.
+- The application is designed for local networks and does not support internet-based communication.
 
-CONNECTING OTHER DEVICES ON LAN TO SERVER (No Inter Network Communication)
+## License
+This project is licensed under the MIT License.
 
-
-- Go into client.py and search near the bottom for |server = "127.0.0.1"|
-
-- Change this value to the ip address of the device you wish to use to
-  host the server on. This can be found if you type "ipconfig" into cmd
-  and look at IPv4 address
-
-- Start server using either client_launcher.py or by running server.py 
-  from cmd / powershell (you can close the server by either entering 
-  "ctrl + c" or just closing the terminal)
-
-- If running server from cmd / powershell by itself make sure to run 
-  client.py aswell on the two (or more) devices you are using. Or run just
-  one if you're sad I guess.
-
-
-end
+## Contact
+For questions or support, please contact connorknoetze@example.com.
